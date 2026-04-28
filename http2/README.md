@@ -15,8 +15,5 @@ This is called "the wrapping implementation", since it wraps net/http.
 
 The original implementation is used when the Go version is less than 1.27.
 
-When the Go version is 1.27 or higher, the original implementation is used
-by default and the wrapping "http2wrap" build tag
-
-When the Go version is less than Go 1.27 and the "http2wrap" build tag is set,
-the wrapping implementation is used. Otherwise, the original implementaiton is used.
+The wrapping implementation is used when the Go version is at least 1.27.
+The build tag "http2legacy" may be set to use the original implementation.

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:build go1.27 && http2wrap
+//go:build go1.27 && !http2legacy
 
 package http2
 
@@ -14,5 +14,5 @@ func (t *Transport) TestTransport() *http.Transport {
 }
 
 func (s *Server) TestSetNewConnFunc(f func(*ServerConn)) {
-	panic("ServerConns are not available with http2wrap")
+	panic("ServerConns are only available with http2legacy")
 }

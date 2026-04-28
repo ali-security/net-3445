@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:build !(go1.27 && http2wrap)
+//go:build !(go1.27 && !http2legacy)
 
 // Transport code's client connection pooling.
 

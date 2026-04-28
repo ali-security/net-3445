@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:build go1.27 && http2wrap
+//go:build go1.27 && !http2legacy
 
 // Transport wrapping a net/http.Transport.
 
@@ -368,7 +368,7 @@ func (cc *ClientConn) updateStateLocked() {
 
 func (cc *ClientConn) stopIdleTimer() {}
 
-// traceGotConn is (when http2wrap is enabled) only used for tracing
+// traceGotConn is (when http2legacy is not enabled) only used for tracing
 // connections acquired while using a user-provided ClientConnPool.
 func traceGotConn(req *http.Request, cc *ClientConn, reused bool) {
 	trace := httptrace.ContextClientTrace(req.Context())

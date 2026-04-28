@@ -52,7 +52,7 @@ func testTestClientConn(t testing.TB) {
 	req, _ := http.NewRequest("PUT", "https://dummy.tld/", body)
 	rt := tc.roundTrip(req)
 
-	// Note: rt.streamID can give the stream ID, but not when using http2wrap.
+	// Note: rt.streamID can give the stream ID, but only with http2legacy.
 	streamID := uint32(1)
 
 	// tc has a number of methods to check for expected frames sent.

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:build go1.27 && !http2wrap
+//go:build go1.27 && !http2legacy
 
 package http2_test
 
@@ -11,8 +11,8 @@ import (
 	"testing"
 )
 
-func TestWrap(t *testing.T) {
-	goTest(t, "-tags=http2wrap", ".")
+func TestLegacy(t *testing.T) {
+	goTest(t, "-tags=http2legacy", "golang.org/x/net/http2")
 }
 
 // TestSuccess is a no-op test for confirming we can re-run "go test".
