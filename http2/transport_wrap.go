@@ -142,7 +142,7 @@ func (t *Transport) init() {
 		if t.t1 != nil {
 			return
 		}
-		t1 := http.DefaultTransport.(*http.Transport).Clone()
+		t1 := &http.Transport{}
 		t.configure(t1)
 	})
 }
