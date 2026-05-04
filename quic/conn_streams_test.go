@@ -12,6 +12,7 @@ import (
 	"sync"
 	"testing"
 	"testing/synctest"
+	"time"
 )
 
 func TestStreamsCreate(t *testing.T) {
@@ -580,4 +581,47 @@ func testStreamsPTOWithImplicitStream(t *testing.T) {
 			id:   newStreamID(clientSide, bidiStream, 1),
 			data: data,
 		})
+}
+
+func TestStreamsLocalLimitsRace(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		tc := newTestConn(t, clientSide, permissiveTransportParameters)
+		tc.handshake()
+
+		var wg sync.WaitGroup
+		defer wg.Wait()
+		ctx, cancel := context.WithCancel(t.Context())
+		defer cancel()
+
+		// Repeatedly create new streams, which should trigger writes on
+		// the number of streams opened.
+		wg.Go(func() {
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				default:
+					s, err := tc.conn.NewStream(ctx)
+					if err == nil {
+						s.Flush()
+					}
+					// Yield to let other goroutines run. This is a synctest,
+					// so we use time.Sleep instead of runtime.Gosched.
+					time.Sleep(time.Nanosecond)
+				}
+			}
+		})
+
+		// At the same time, repeatedly send MAX_STREAM_DATA frames,
+		// which should trigger reads on the number of streams opened.
+		sid := newStreamID(clientSide, bidiStream, 0)
+		for range 1000 {
+			tc.writeFrames(packetType1RTT, debugFrameMaxStreamData{
+				id:  sid,
+				max: 1000,
+			})
+			// Yield to let the conn loop process the frame.
+			time.Sleep(time.Nanosecond)
+		}
+	})
 }
