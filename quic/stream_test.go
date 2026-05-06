@@ -1064,6 +1064,30 @@ func testStreamWriteMoreThanOnePacketOfData(t *testing.T) {
 	}
 }
 
+func TestStreamResetWithUnsentData(t *testing.T) {
+	synctest.Test(t, testStreamResetWithUnsentData)
+}
+func testStreamResetWithUnsentData(t *testing.T) {
+	tc, s := newTestConnAndLocalStream(t, clientSide, uniStream,
+		func(p *transportParameters) {
+			p.initialMaxStreamsUni = maxStreamsLimit
+			p.initialMaxData = 0
+			p.initialMaxStreamDataUni = 1000
+		})
+
+	s.Write([]byte("data"))
+	s.Flush()
+	tc.wantIdle("data is blocked by connection-level flow control")
+
+	s.Reset(0)
+	tc.wantFrame("stream is reset",
+		packetType1RTT, debugFrameResetStream{
+			id:        s.id,
+			code:      0,
+			finalSize: 0, // We sent no bytes.
+		})
+}
+
 func TestStreamCloseWaitsForAcks(t *testing.T) {
 	synctest.Test(t, testStreamCloseWaitsForAcks)
 }
